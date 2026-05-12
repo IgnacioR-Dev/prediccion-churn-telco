@@ -1,0 +1,48 @@
+
+services:
+    database:
+        image: postgres:14-alpine
+        container_name: chrurn_db
+        restart: always
+        env_file:
+            - .env
+        environment:
+            - POSTGRES_USER=${DB_USER}
+            - POSTGRES_PASSWORD=${DB_PASSWORD}
+            - POSTGRES_DB=${DB_NAME}
+        ports:
+            - "5432:5432"
+        volumes:
+            - pgdata:/var/lib/postgresql/data 
+            - ./src/data/init.sql:/docker-entrypoint-initdb.d/init.sql 
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+            interval: 5s
+            retries: 5 
+
+    ml:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        env_file:
+            - .env
+        #para que primero se levante la base de datos y luego el servicio 
+        depends_on:
+            database:
+                condition: service_healthy
+        
+volumes:
+    pgdata:
+
+    
+    # docker compose up -d
+    # docker exec -it chrurn_db psql -U Admin -d ia_data
+    # docker-compose down -v
+    # creacion del entorno virtual 
+    # python -m venv venv
+    # activacion del entorno virtual
+    # venv\Scripts\activate
+
+# RUN python -m pip install --upgrade pip
+# SELECT count(*) FROM clientes_telecom;
+# SELECT * FROM clientes_telecom LIMIT 10;
