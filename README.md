@@ -6,9 +6,9 @@ Este proyecto desarrolla un modelo de machine learning orientado a la detección
 
 Puede variar según las necesidades del proyecto.
 
-- Scripts de procesamiento: ingesta, validación, limpieza y transformación de datos.
+- Scripts de procesamiento: ingesta, validación, limpieza y transformación de datos. Además, el último script contempla el uso de otros, tales como: feature engineering, winsorizer y filtro de correlacion, ya que se separo todo para mejorar la modularización del código pero actúan en conjunto.
 - Base de datos PostgreSQL: para la carga y consulta estructurada de los datasets.
-- Modelo de IA (scikit-learn): clasificación binaria para predicción de churn (continuidad o cancelación del servicio de telecomunicaciones).
+- Modelo de IA (scikit-learn): clasificación binaria para predicción de churn (continuidad o cancelación del servicio de telecomunicaciones) a tráves del algoritmo random forest classifier.
 - Metabase: dashboard de visualización de resultados.
 - Documentación: diseño técnico completo + planificación.
 
@@ -29,11 +29,17 @@ prediccion-churn-telco/
 │   │   └── conexion.py
 │   ├── ml/
 │   │   ├── pipeline/
+│   │   │   ├── feature_engineering.py
+│   │   │   ├── filtro_correlacion.py
 │   │   │   ├── ingesta_datos.py
-│   │   │   └── validador.py
+│   │   │   ├── limpieza_transformacion.py
+│   │   │   ├── validador.py
+│   │   │   └── winsorizer.py
 │   │   ├── main.py
 │   │   ├── Dockerfile
 │   │   └── requirements.txt
+│   └── notebooks/
+│       └── analisis_exploratorio.ipynb
 ├── .env
 ├── .gitignore
 └── docker-compose.yml
@@ -121,6 +127,9 @@ Para eliminar también los volúmenes de datos:
 ```bash
 docker-compose down -v
 ```
+## EDA (análisis exploratorio de datos)
+
+Previo a la construcción del pipeline, se realizó un análisis exploratorio documentado en `src/notebooks/analisis_exploratorio.ipynb`. El análisis cubre la distribución del target, la tasa de churn por variable, la fuerza de asociación mediante Cramér's V y correlación de Pearson, la detección de redundancia entre variables y la propuesta de nuevas features. Cada sección incluye visualizaciones e interpretaciones que fundamentan las decisiones tomadas en el pipeline de transformación.
 
 ## Pipeline implementado
 
@@ -137,8 +146,19 @@ docker-compose down -v
 - Cálculo de score de calidad por columna y global del dataset
 - Generación de reporte detallado de calidad de datos
 
+### Etapa 2 — Limpieza y transformación
+- Eliminación de filas duplicadas
+- Ingeniería de características: colapso semántico de categorías redundantes, creación de variables agregadas (`n_services_protection`, `n_services_streaming`) y variable de interacción (`contract_payment_risk`)
+- Tratamiento de valores atípicos mediante Winsorización con recorte del 5% en cada extremo de la distribución
+- Imputación de valores nulos por media en variables numéricas continuas, moda en discretas y categóricas
+- Escalado estándar de variables numéricas
+- Codificación One-Hot de variables categóricas (drop first)
+- Filtro de colinealidad residual con umbral de correlación de Pearson (0.9)
+- Exportación del dataset transformado a `data_limpia.csv`
+- Carga final en la base de datos con los registros limpios y las features para el entrenamiento
+
+
 ### Próximas etapas
-- Etapa 2: Limpieza y transformación de datos (se contempla feature engineering)
 - Etapa 3: Entrenamiento del modelo
 - Etapa 4: Visualización con Metabase
 
