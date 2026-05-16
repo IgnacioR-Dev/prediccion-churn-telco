@@ -1,20 +1,22 @@
 
-from pipeline.ingesta import ingestas
-from pipeline.limAndTransformacion import DataCleaningPipeline
-from pipeline.featureEngeneering import FeatureEngineering
+import os
+import pandas as pd
+
+from ml.pipeline.limAndTransformacion import DataCleaningPipeline
+from ml.pipeline.ingesta import ingestas, ingesta_limpia
+
+ruta = os.path.join(os.path.dirname(__file__), ".." ,"data", "Telco-Customer-Churn.csv")
 
 def main():
-    print("Proceso de ingesta completado.")
-    ingestas()
+    ingestas()   
+    print("\n----------------------------------------------")
     
-    pipeline = DataCleaningPipeline()
-    fe = FeatureEngineering()
-    pipeline.add_step('remove_duplicados', pipeline.remove_duplicados)
-    pipeline.add_step('remove_valor_faltante', pipeline.remove_valor_faltante)
-    pipeline.add_step('remove_inconsistentes', pipeline.remove_inconsistente)
-    pipeline.add_step('ingenieria_caracteristicas', fe.transform)
-
-
-
+    data = pd.read_csv(ruta, sep=",")
+    cleaner = DataCleaningPipeline()
+    cleaner.llamado(data)
+    
+    ingesta_limpia()
+    print("\n----------------------------------------------")
+    
 if __name__ == "__main__": 
     main()
