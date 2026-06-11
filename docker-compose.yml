@@ -38,6 +38,8 @@ services:
 
     volumes:
       - ./src/data:/app/data
+      - ./src/ml/results:/app/ml/results
+      - ./src/ml/models:/app/ml/models
 
 volumes:
   postgres_data:
