@@ -30,7 +30,7 @@ def testear_modelo():
     # Cargar datos
     # -------------------------------------------------
     rutadata = os.path.join(os.path.dirname(__file__),"..","..","data","data_limpia.csv")
-    data = pd.read_csv(rutadata, sep=";")
+    data = pd.read_csv(rutadata, sep=";", decimal=",")
 
 
     # -------------------------------------------------

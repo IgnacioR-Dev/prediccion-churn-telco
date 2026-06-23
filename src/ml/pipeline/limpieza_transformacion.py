@@ -193,7 +193,7 @@ def ejecutar_transformacion(exportar_csv=True, exportar_bd=True):
             ruta_salida,
             index=False,
             sep=";",
-            decimal="."
+            decimal=","
         )
 
     print("\nDataset limpio exportado correctamente.")
