@@ -58,8 +58,11 @@ def ejecutar_transformacion(exportar_csv=True, exportar_bd=True):
         "data",
         "02_Base_Customer-Churn.csv"
     )
-
+    
     data = pd.read_csv(ruta_data, sep=";")
+
+    #para eliminar los duplicados pero solo tomando encuenta la columna Id para realizarlo 
+    data = data.drop_duplicates(subset=["customerID"], keep="last")
 
     # separación de variable objetivo
     target = "Churn"
@@ -174,6 +177,10 @@ def ejecutar_transformacion(exportar_csv=True, exportar_bd=True):
         X_transformada,
         columns=cols_finales
     )
+
+    # para eliminar las columnas duplicadas que puedan surgir del preprocesamiento, 
+    # asegurando que cada columna sea única en el dataset final.
+    data_transformada = data_transformada.loc[:, ~data_transformada.columns.duplicated()]
 
     # agregado de variable objetivo
     data_transformada["churn"] = y.values
